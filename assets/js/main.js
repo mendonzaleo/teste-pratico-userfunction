@@ -1,12 +1,15 @@
 let currentPage = 1;
-const url = `https://jsonplaceholder.typicode.com/posts?userId=${currentPage}`
 let posts = [];
-
-async function chamarAPI(url){
+const loadNewPage = document.getElementById("button");
+const loadlastPage = document.getElementById("btn-last-page");
+async function chamarAPI(){
+    const url = `https://jsonplaceholder.typicode.com/posts?_page=${currentPage}&_limit=5`
     const resp = await fetch(url)
     if(resp.status == 200){
         posts = await resp.json();
         exibirPosts(posts);
+    }else {
+        console.error("Erro ao buscar os posts", resp.status);
     }
 }
 function exibirPosts(posts){
@@ -25,11 +28,22 @@ function exibirPosts(posts){
     });
 }
 
-function updatePage(){
+function nextPage() {
+    if(currentPage == 20){
+        console.error("Não há mais páginas para mostrar!")
+    }else{
         currentPage++;
-        chamarAPI(url);
+        chamarAPI();
+    }
 }
-document.querySelector("#button").addEventListener("click", updatePage);
-chamarAPI(url);
 
-    
+function lastPage() {
+    if(currentPage > 1){
+        currentPage--;
+        chamarAPI();
+    }
+}
+
+loadNewPage.addEventListener("click", nextPage);
+loadlastPage.addEventListener("click", lastPage);
+chamarAPI();
